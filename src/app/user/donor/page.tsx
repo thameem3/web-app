@@ -1,64 +1,97 @@
 "use client";
-import React from "react";
-import { Typography } from "@mui/material";
-import DashboardCard from "@/app/components/Dashboardcard";
-import { Favorite, HourglassBottom, CheckCircle, History, FoodBank } from "@mui/icons-material";
-import { Button } from "@mui/material";
+import React, { useState } from "react";
+import {
+  AppBar,
+  Toolbar,
+  Typography,
+  IconButton,
+  Drawer,
+  List,
+  ListItem,
+  ListItemButton,
+  ListItemText,
+  Button
+} from "@mui/material";
+import MenuIcon from "@mui/icons-material/Menu";
 import Link from "next/link";
-
+import { useRouter } from "next/navigation";
 
 const DonorDashboard = () => {
+  const [open, setOpen] = useState(false);
+  const router = useRouter();
+
+  const handleLogout = () => {
+    localStorage.removeItem("userId");
+    localStorage.removeItem("token");
+    router.push("/login");
+  };
+
   return (
-    <div className="flex min-h-screen bg-gray-100">
-      {/* Sidebar */}
-      <aside className="w-64 bg-white shadow-md p-4">
-      <h2 className="text-2xl font-bold text-green-600 mb-6">Donor Panel</h2>
-      <ul className="space-y-4 text-gray-700 font-medium">
-        <li>
-          <Link href="/user/donor" className="hover:text-green-700">
-            Dashboard
+    <div className="flex flex-col min-h-screen bg-gray-100">
+      {/* Navbar */}
+      <AppBar position="static" sx={{ backgroundColor: "#2e7d32" }}>
+        <Toolbar>
+          <IconButton
+            color="inherit"
+            edge="start"
+            onClick={() => setOpen(true)}
+            sx={{ mr: 2 }}
+          >
+            <MenuIcon />
+          </IconButton>
+          <Typography variant="h6" sx={{ flexGrow: 1 }}>
+            Welcome 
+          </Typography>
+           <Link href="/user/donor/donate">
+            <Button variant="contained" color="error">
+              Donate Food
+            </Button>
           </Link>
-        </li>
-        <li>
-          <Link href="/user/donor/donation-history" className="hover:text-green-700">
-            Donation History
-          </Link>
-        </li>
-        <li>
-          <Link href="/user/donor/profile" className="hover:text-green-700">
-            Profile
-          </Link>
-        </li>
-      </ul>
-    </aside>
+          <Button color="inherit" onClick={handleLogout}>
+            Logout
+          </Button>
+         
+        </Toolbar>
+      </AppBar>
+
+      {/* Sidebar Drawer */}
+      <Drawer open={open} onClose={() => setOpen(false)}>
+        <List sx={{ width: 250 }}>
+          <ListItem disablePadding>
+            <ListItemButton component={Link} href="/user/donor" onClick={() => setOpen(false)}>
+              <ListItemText primary="Dashboard" />
+            </ListItemButton>
+          </ListItem>
+
+          <ListItem disablePadding>
+            <ListItemButton
+              component={Link}
+              href="/user/donor/donation-history"
+              onClick={() => setOpen(false)}
+            >
+              <ListItemText primary="Donation History" />
+            </ListItemButton>
+          </ListItem>
+
+          <ListItem disablePadding>
+            <ListItemButton component={Link} href="/user/donor/profile" onClick={() => setOpen(false)}>
+              <ListItemText primary="Profile" />
+            </ListItemButton>
+          </ListItem>
+
+          <ListItem disablePadding>
+            <ListItemButton onClick={handleLogout}>
+              <ListItemText primary="Logout" />
+            </ListItemButton>
+          </ListItem>
+        </List>
+      </Drawer>
 
       {/* Main Content */}
       <main className="flex-1 p-6">
-        <div className="flex items-center justify-between mb-6">
-          <Typography variant="h4" className="text-green-700 font-bold">
-            Welcome to Your Dashboard
-          </Typography>
-          <Link href="/user/donor/donate">
-           <Button variant="contained" color="success">
-            Donate Food
-          </Button>
-          </Link>
-        </div>
-        {/* Cards Section */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-          <DashboardCard icon={Favorite} title="Total Donations" value="12 Donations" color="text-red-500" />
-          <DashboardCard icon={HourglassBottom} title="Pending Pickups" value="3 in Progress" color="text-yellow-600" />
-          <DashboardCard icon={CheckCircle} title="Completed" value="9 Completed" color="text-green-600" />
-        </div>
 
-        {/* Additional Section */}
-        <Typography variant="h6" className="mb-4">
-          Recent Activity
-        </Typography>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <DashboardCard icon={History} title="Last Donation" value="30 July, 2025" color="text-blue-600" />
-          <DashboardCard icon={FoodBank} title="Upcoming Donation Slot" value="02 August, 2025" color="text-purple-600" />
-        </div>
+        {/* Cards Section */}
+       
       </main>
     </div>
   );

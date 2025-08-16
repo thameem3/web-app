@@ -4,7 +4,7 @@ import {
   TextField,
   Button,
   Divider,
-  Typography,
+  Typography,Snackbar,Alert,
   Link as MuiLink,
 } from "@mui/material";
 import Link from "next/link";
@@ -14,6 +14,11 @@ const Login = () => {
   const router = useRouter();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [open, setOpen] = useState(false);
+  const [snackbarMessage, setSnackbarMessage] = useState("");
+  const [snackbarSeverity, setSnackbarSeverity] = useState<"success" | "error" | "warning" | "info">("info");
+
+  const handleClose = () => setOpen(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -31,18 +36,27 @@ const Login = () => {
 
       if (response.ok) {
         localStorage.setItem("token", data.token); // Save JWT
-        if (data.role === "donor") {
-          router.push("/user/donor");
-        } else {
-          router.push("/user/donor");
-        }
-      } else {
-        alert(data.message || "Login failed");
-      }
+        setSnackbarMessage("Login successful!");
+        setSnackbarSeverity("success");
+        setOpen(true);
 
+        setTimeout(() => {
+          if (data.role === "donor") {
+            router.push("/user/donor");
+          } else {
+            router.push("/user/donor");
+          }
+        }, 1500); // Small delay so user sees success message
+      } else {
+        setSnackbarMessage(data.message || "Login failed");
+        setSnackbarSeverity("error");
+        setOpen(true);
+      }
     } catch (error) {
       console.error("Login error:", error);
-      alert("Something went wrong");
+      setSnackbarMessage("Something went wrong");
+      setSnackbarSeverity("error");
+      setOpen(true);
     }
   };
 
@@ -99,7 +113,6 @@ const Login = () => {
           </form>
 
           <Divider sx={{ my: 3 }}>or</Divider>
-
           <Button variant="outlined" fullWidth>
             Sign in with Google
           </Button>
@@ -114,7 +127,21 @@ const Login = () => {
           </Typography>
         </div>
       </div>
+       {/* Snackbar Component */}
+      <Snackbar
+        open={open}
+        autoHideDuration={3000}
+        onClose={handleClose}
+        anchorOrigin={{ vertical: "bottom", horizontal: "left" }}>
+        <Alert
+          onClose={handleClose}
+          severity={snackbarSeverity}
+          sx={{ width: "100%" }}>
+          {snackbarMessage}
+        </Alert>
+      </Snackbar>
     </div>
+    
   );
 };
 

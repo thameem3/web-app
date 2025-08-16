@@ -16,7 +16,6 @@ export default function FoodHistoryPage() {
         console.error("Error fetching donations:", err);
       }
     };
-
     fetchDonations();
   }, []);
 
